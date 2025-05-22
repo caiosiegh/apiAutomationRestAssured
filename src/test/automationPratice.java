@@ -1,10 +1,18 @@
 package test;
 
+import io.restassured.http.ContentType;
+import io.restassured.mapper.ObjectMapperDeserializationContext;
+import io.restassured.mapper.ObjectMapperSerializationContext;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 public class automationPratice {
 
@@ -52,7 +60,8 @@ public class automationPratice {
                 .contentType("application/x-www-form-urlencoded")
                 .formParam("no_search_product", "jean")
                 .post("https://automationexercise.com/api/searchProduct")
-                .then().log().all().body(containsString("responseCode")).body(containsString("400"))
+                .then().log().all().body(containsString("responseCode"))
+                .body(containsString("400"))
                 .body(containsString("search_product parameter is missing"));
     }
 
@@ -169,4 +178,21 @@ public class automationPratice {
                 .then().statusCode(200).log().body();
     }
 
+    @Test
+    public void postToCreateRegisterUserAccountPOJO() {
+
+        Register register = new Register("testName", "testEmailSiegh2@outlook.com", "Teste123!", "Mr", 29, 8, 1987, "Siegh", "Wind", "YT", "Rua tal",
+                "Bairro tal", "Brazil", "88888-963", "MG", "BH", "8888-8888");
+
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> params = mapper.convertValue(register, new TypeReference<>() {});
+
+
+        given()
+                .contentType("application/x-www-form-urlencoded")
+                .formParams(params)
+                .post("https://automationexercise.com/api/createAccount")
+                .then().statusCode(200).log().all().body(containsString("responseCode")).body(containsString("201"))
+                .body(containsString("User created!"));
+    }
 }
